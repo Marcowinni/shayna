@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -10,11 +10,11 @@
       --bg:#eaa0a8;
       --card:#ffffff;
       --shadow: 0 22px 50px rgba(0,0,0,.18);
-      --radius: 26px;
+      --radius: 28px;
       --red:#ff1f3a;
-      --yes:#a9f1b8;
+      --yes1:#a9f1b8;
       --yes2:#78e49a;
-      --no:#ff9a9a;
+      --no1:#ff9a9a;
       --no2:#ff6f7b;
     }
 
@@ -39,6 +39,7 @@
       filter: drop-shadow(0 6px 10px rgba(0,0,0,.15));
       animation: floatUp linear forwards;
       pointer-events:none;
+      z-index: 1;
     }
     @keyframes floatUp{
       from{ transform: translateY(105vh) scale(.9) rotate(0deg); }
@@ -46,85 +47,62 @@
     }
 
     .card{
-      width:min(820px, 92vw);
-      min-height: 320px;
+      width:min(880px, 92vw);
+      min-height: 340px;
       background: var(--card);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
-      padding: 54px 56px 46px;
+      padding: 58px 58px 50px;
+      text-align:center;
       position: relative;
       z-index: 5;
     }
 
-    .title{
-      margin: 0 0 34px;
-      font-size: clamp(34px, 3.4vw, 52px);
+    h1{
+      margin:0 0 34px;
+      font-size: clamp(36px, 3.6vw, 56px);
       line-height: 1.1;
-      text-align:center;
       color: var(--red);
-      font-weight: 900;
+      font-weight: 1000;
       letter-spacing: .2px;
-      text-shadow: 0 2px 0 rgba(0,0,0,.03);
     }
 
-    .sub{
-      margin: 0 0 30px;
-      text-align:center;
-      color:#444;
-      font-size: 16px;
-      opacity:.8;
-    }
-
-    /* Buttons row */
-    .btn-row{
+    .buttons{
       display:flex;
       justify-content:center;
       gap: 18px;
-      position: relative;
-      height: 72px; /* keeps layout stable */
-      margin-top: 10px;
+      margin-top: 8px;
     }
 
     button{
       border: none;
       border-radius: 14px;
-      padding: 14px 30px;
+      padding: 14px 32px;
       font-size: 18px;
-      font-weight: 800;
+      font-weight: 900;
       cursor:pointer;
-      transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
       box-shadow: 0 10px 22px rgba(0,0,0,.12);
+      transition: transform .15s ease, filter .15s ease;
       user-select:none;
     }
 
     #yesBtn{
-      background: linear-gradient(180deg, var(--yes) 0%, var(--yes2) 100%);
+      background: linear-gradient(180deg, var(--yes1) 0%, var(--yes2) 100%);
     }
     #yesBtn:hover{ transform: translateY(-2px) scale(1.03); }
     #yesBtn:active{ transform: translateY(0px) scale(.99); }
 
-    /* No button is moved within the row, not across the screen */
-    .no-wrap{
-      position: relative;
-      width: 160px;   /* lane so it never overlaps Yes */
-      height: 72px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      overflow: hidden; /* keeps it inside its lane */
-    }
-
+    /* The runaway NO button lives on the screen (not in the card) */
     #noBtn{
-      position:absolute;
+      position: fixed;
       left: 50%;
       top: 50%;
       transform: translate(-50%, -50%);
-      background: linear-gradient(180deg, var(--no) 0%, var(--no2) 100%);
+      background: linear-gradient(180deg, var(--no1) 0%, var(--no2) 100%);
+      z-index: 999; /* above card */
     }
-
     #noBtn:hover{ filter: brightness(1.02); }
 
-    /* Success screen */
     .success{
       height:100vh;
       display:flex;
@@ -142,71 +120,89 @@
 
 <body>
   <div class="card" id="card">
-    <h1 class="title">Shayyyy Will you be my Valentine?</h1>
-    <p class="sub">Be careful… the "No" button is a bit shy 😈❤️</p>
-
-    <div class="btn-row" id="row">
+    <h1>Will you be my Valentine?</h1>
+    <div class="buttons">
       <button id="yesBtn">Yes</button>
-
-      <div class="no-wrap" id="noWrap">
-        <button id="noBtn">No</button>
-      </div>
+      <!-- Platzhalter, damit es "wie 2 Buttons" aussieht -->
+      <span style="width: 0;"></span>
     </div>
   </div>
+
+  <!-- No Button ist absichtlich ausserhalb der Card -->
+  <button id="noBtn" aria-label="No">No</button>
 
 <script>
   const yesBtn = document.getElementById("yesBtn");
   const noBtn  = document.getElementById("noBtn");
-  const noWrap = document.getElementById("noWrap");
 
-  // ~2 cm on most screens: 20px
-  const STEP = 20;
+  // Genau 6 Fixpunkte (in % vom Screen) - verteilt ueber den ganzen Screen
+  // Du kannst die Werte easy anpassen.
+  const points = [
+    { x: 15, y: 20 },
+    { x: 80, y: 18 },
+    { x: 85, y: 72 },
+    { x: 18, y: 78 },
+    { x: 50, y: 85 },
+    { x: 50, y: 15 },
+  ];
 
-  // Direction flips when we hit bounds
-  let dir = 1;
-  let offset = 0;
+  let currentIndex = -1;
 
   function clamp(val, min, max){ return Math.max(min, Math.min(max, val)); }
 
-  function nudgeNo(){
-    const wrapW = noWrap.clientWidth;
-    const btnW  = noBtn.offsetWidth;
+  function moveNoToPoint(idx){
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
 
-    // Max offset from center so button stays fully inside lane
-    const maxOffset = Math.floor((wrapW - btnW) / 2) - 2; // small margin
-    if (maxOffset <= 0) return;
+    // Button groesse beachten, damit er nie aus dem Screen geht
+    const bw = noBtn.offsetWidth;
+    const bh = noBtn.offsetHeight;
 
-    // Try to move by STEP, but stay within bounds
-    let next = offset + dir * STEP;
+    const margin = 12;
 
-    if (next >  maxOffset) { dir = -1; next = offset + dir * STEP; }
-    if (next < -maxOffset) { dir =  1; next = offset + dir * STEP; }
+    let px = (points[idx].x / 100) * vw;
+    let py = (points[idx].y / 100) * vh;
 
-    offset = clamp(next, -maxOffset, maxOffset);
+    // Clamp damit der Button ganz sichtbar bleibt
+    px = clamp(px, margin + bw/2, vw - margin - bw/2);
+    py = clamp(py, margin + bh/2, vh - margin - bh/2);
 
-    // Move horizontally only (no jumping around)
-    noBtn.style.transform = `translate(calc(-50% + ${offset}px), -50%)`;
+    noBtn.style.left = px + "px";
+    noBtn.style.top  = py + "px";
   }
 
-  // Make it hard to click "No"
-  noBtn.addEventListener("pointerenter", nudgeNo);
-  noBtn.addEventListener("pointerdown", (e) => { e.preventDefault(); nudgeNo(); });
-  noBtn.addEventListener("click", (e) => { e.preventDefault(); nudgeNo(); });
+  function jumpNo(){
+    let next = currentIndex;
 
-  // Yes action
+    // neuen Punkt waehlen, aber nicht derselbe wie vorher
+    while(next === currentIndex){
+      next = Math.floor(Math.random() * points.length);
+    }
+    currentIndex = next;
+    moveNoToPoint(currentIndex);
+  }
+
+  // Initial platzieren
+  jumpNo();
+
+  // Wenn man "No" anklicken/hovern will -> springt er weg
+  noBtn.addEventListener("pointerenter", jumpNo);
+  noBtn.addEventListener("pointerdown", (e) => { e.preventDefault(); jumpNo(); });
+  noBtn.addEventListener("click", (e) => { e.preventDefault(); jumpNo(); });
+
+  // Yes Aktion
   yesBtn.addEventListener("click", () => {
     document.body.innerHTML = `<div class="success">YAAAY ❤️<br/>You made my day!</div>`;
-    // little heart burst
-    for(let i=0;i<20;i++) spawnHeart(true);
+    for(let i=0;i<18;i++) spawnHeart(true);
   });
 
-  // Floating hearts generator
+  // Herzen
   function spawnHeart(burst=false){
     const heart = document.createElement("div");
     heart.className = "heart";
     heart.textContent = "❤️";
 
-    const x = burst ? (window.innerWidth * 0.5 + (Math.random()-0.5)*300) : (Math.random()*window.innerWidth);
+    const x = burst ? (window.innerWidth*0.5 + (Math.random()-0.5)*320) : (Math.random()*window.innerWidth);
     heart.style.left = x + "px";
 
     const size = burst ? (18 + Math.random()*26) : (18 + Math.random()*34);
@@ -218,14 +214,11 @@
     document.body.appendChild(heart);
     setTimeout(() => heart.remove(), dur*1000);
   }
-
   setInterval(() => spawnHeart(false), 450);
 
-  // Ensure No button stays valid on resize
+  // Bei Resize neu clampen, damit No weiterhin sichtbar bleibt
   window.addEventListener("resize", () => {
-    offset = 0;
-    dir = 1;
-    noBtn.style.transform = `translate(-50%, -50%)`;
+    if(currentIndex >= 0) moveNoToPoint(currentIndex);
   });
 </script>
 </body>
