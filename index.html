@@ -1,225 +1,203 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Valentine</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Valentine</title>
 
-  <style>
-    :root{
-      --bg:#eaa0a8;
-      --card:#ffffff;
-      --shadow: 0 22px 50px rgba(0,0,0,.18);
-      --radius: 28px;
-      --red:#ff1f3a;
-      --yes1:#a9f1b8;
-      --yes2:#78e49a;
-      --no1:#ff9a9a;
-      --no2:#ff6f7b;
-    }
+<style>
+:root{
+  --bg:#eaa0a8;
+  --card:#ffffff;
+  --red:#ff2b40;
+  --yes1:#a9f1b8;
+  --yes2:#6edc92;
+  --no1:#ff9a9a;
+  --no2:#ff6f7b;
+}
 
-    *{ box-sizing:border-box; }
+*{box-sizing:border-box;}
 
-    body{
-      margin:0;
-      height:100vh;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      background: radial-gradient(1200px 600px at 50% 20%, #f6bcc2 0%, var(--bg) 60%, #e4929d 100%);
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      overflow:hidden;
-    }
+body{
+  margin:0;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background: radial-gradient(1200px 600px at 50% 20%, #f6bcc2 0%, var(--bg) 60%, #e4929d 100%);
+  font-family: system-ui, -apple-system, sans-serif;
+  overflow:hidden;
+}
 
-    /* Floating hearts */
-    .heart{
-      position:absolute;
-      font-size: 26px;
-      opacity:.85;
-      filter: drop-shadow(0 6px 10px rgba(0,0,0,.15));
-      animation: floatUp linear forwards;
-      pointer-events:none;
-      z-index: 1;
-    }
-    @keyframes floatUp{
-      from{ transform: translateY(105vh) scale(.9) rotate(0deg); }
-      to  { transform: translateY(-15vh) scale(1.1) rotate(360deg); }
-    }
+/* CARD */
+.card{
+  width:min(1000px, 95vw);
+  min-height:420px;
+  background:var(--card);
+  border-radius:32px;
+  box-shadow:0 30px 60px rgba(0,0,0,.18);
+  padding:70px 60px;
+  text-align:center;
+  position:relative;
+  z-index:5;
+}
 
-    .card{
-      width:min(880px, 92vw);
-      min-height: 340px;
-      background: var(--card);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 58px 58px 50px;
-      text-align:center;
-      position: relative;
-      z-index: 5;
-    }
+h1{
+  font-size:clamp(48px,4vw,72px);
+  margin:0 0 20px;
+  color:var(--red);
+  font-weight:1000;
+}
 
-    h1{
-      margin:0 0 34px;
-      font-size: clamp(36px, 3.6vw, 56px);
-      line-height: 1.1;
-      color: var(--red);
-      font-weight: 1000;
-      letter-spacing: .2px;
-    }
+.sub{
+  font-size:20px;
+  color:#666;
+  margin-bottom:40px;
+}
 
-    .buttons{
-      display:flex;
-      justify-content:center;
-      gap: 18px;
-      margin-top: 8px;
-    }
+/* BUTTONS */
+.buttons{
+  display:flex;
+  justify-content:center;
+  gap:30px;
+}
 
-    button{
-      border: none;
-      border-radius: 14px;
-      padding: 14px 32px;
-      font-size: 18px;
-      font-weight: 900;
-      cursor:pointer;
-      box-shadow: 0 10px 22px rgba(0,0,0,.12);
-      transition: transform .15s ease, filter .15s ease;
-      user-select:none;
-    }
+button{
+  border:none;
+  border-radius:18px;
+  padding:20px 45px;
+  font-size:22px;
+  font-weight:900;
+  cursor:pointer;
+  box-shadow:0 15px 30px rgba(0,0,0,.15);
+  transition:.2s ease;
+}
 
-    #yesBtn{
-      background: linear-gradient(180deg, var(--yes1) 0%, var(--yes2) 100%);
-    }
-    #yesBtn:hover{ transform: translateY(-2px) scale(1.03); }
-    #yesBtn:active{ transform: translateY(0px) scale(.99); }
+#yesBtn{
+  background:linear-gradient(180deg,var(--yes1),var(--yes2));
+}
 
-    /* The runaway NO button lives on the screen (not in the card) */
-    #noBtn{
-      position: fixed;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      background: linear-gradient(180deg, var(--no1) 0%, var(--no2) 100%);
-      z-index: 999; /* above card */
-    }
-    #noBtn:hover{ filter: brightness(1.02); }
+#yesBtn:hover{
+  transform:scale(1.07);
+}
 
-    .success{
-      height:100vh;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      background: radial-gradient(900px 500px at 50% 30%, #ffe0e6 0%, #ffb7c5 55%, #ff9db1 100%);
-      font-size: clamp(38px, 4.5vw, 64px);
-      color: #ff1f3a;
-      font-weight: 1000;
-      text-align:center;
-      padding: 24px;
-    }
-  </style>
+#noBtn{
+  background:linear-gradient(180deg,var(--no1),var(--no2));
+  position:relative;
+  z-index:10;
+}
+
+/* Floating hearts */
+.heart{
+  position:absolute;
+  font-size:28px;
+  animation:floatUp linear forwards;
+  pointer-events:none;
+  opacity:.85;
+}
+
+@keyframes floatUp{
+  from{transform:translateY(100vh) rotate(0deg);}
+  to{transform:translateY(-15vh) rotate(360deg);}
+}
+
+.success{
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:#ffb7c5;
+  font-size:64px;
+  font-weight:1000;
+  color:#ff1f3a;
+}
+</style>
 </head>
 
 <body>
-  <div class="card" id="card">
-    <h1>Will you be my Valentine?</h1>
-    <div class="buttons">
-      <button id="yesBtn">Yes</button>
-      <!-- Platzhalter, damit es "wie 2 Buttons" aussieht -->
-      <span style="width: 0;"></span>
-    </div>
-  </div>
 
-  <!-- No Button ist absichtlich ausserhalb der Card -->
-  <button id="noBtn" aria-label="No">No</button>
+<div class="card">
+  <h1>Shayyyy Will you be my Valentine?</h1>
+  <div class="sub">Be careful… the "No" button is a bit shy 😈💗</div>
+
+  <div class="buttons">
+    <button id="yesBtn">Yes</button>
+    <button id="noBtn">No</button>
+  </div>
+</div>
 
 <script>
-  const yesBtn = document.getElementById("yesBtn");
-  const noBtn  = document.getElementById("noBtn");
+const yesBtn = document.getElementById("yesBtn");
+const noBtn = document.getElementById("noBtn");
 
-  // Genau 6 Fixpunkte (in % vom Screen) - verteilt ueber den ganzen Screen
-  // Du kannst die Werte easy anpassen.
-  const points = [
-    { x: 15, y: 20 },
-    { x: 80, y: 18 },
-    { x: 85, y: 72 },
-    { x: 18, y: 78 },
-    { x: 50, y: 85 },
-    { x: 50, y: 15 },
-  ];
+let activated = false;
 
-  let currentIndex = -1;
+// 6 feste Punkte auf dem Screen (in %)
+const points = [
+  {x:15,y:20},
+  {x:80,y:18},
+  {x:85,y:75},
+  {x:15,y:75},
+  {x:50,y:88},
+  {x:50,y:12}
+];
 
-  function clamp(val, min, max){ return Math.max(min, Math.min(max, val)); }
+let currentIndex = -1;
 
-  function moveNoToPoint(idx){
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
+function clamp(val,min,max){return Math.max(min,Math.min(max,val));}
 
-    // Button groesse beachten, damit er nie aus dem Screen geht
-    const bw = noBtn.offsetWidth;
-    const bh = noBtn.offsetHeight;
+function moveNoToPoint(idx){
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const bw = noBtn.offsetWidth;
+  const bh = noBtn.offsetHeight;
 
-    const margin = 12;
+  let px = (points[idx].x/100)*vw;
+  let py = (points[idx].y/100)*vh;
 
-    let px = (points[idx].x / 100) * vw;
-    let py = (points[idx].y / 100) * vh;
+  px = clamp(px, bw/2+10, vw-bw/2-10);
+  py = clamp(py, bh/2+10, vh-bh/2-10);
 
-    // Clamp damit der Button ganz sichtbar bleibt
-    px = clamp(px, margin + bw/2, vw - margin - bw/2);
-    py = clamp(py, margin + bh/2, vh - margin - bh/2);
+  noBtn.style.position = "fixed";
+  noBtn.style.left = px+"px";
+  noBtn.style.top = py+"px";
+  noBtn.style.transform = "translate(-50%,-50%)";
+}
 
-    noBtn.style.left = px + "px";
-    noBtn.style.top  = py + "px";
+function jumpNo(){
+  let next=currentIndex;
+  while(next===currentIndex){
+    next=Math.floor(Math.random()*points.length);
   }
+  currentIndex=next;
+  moveNoToPoint(currentIndex);
+}
 
-  function jumpNo(){
-    let next = currentIndex;
-
-    // neuen Punkt waehlen, aber nicht derselbe wie vorher
-    while(next === currentIndex){
-      next = Math.floor(Math.random() * points.length);
-    }
-    currentIndex = next;
-    moveNoToPoint(currentIndex);
+// Erst wenn man zum ersten Mal hover will, springt er weg
+noBtn.addEventListener("pointerenter",()=>{
+  if(!activated){
+    activated=true;
   }
-
-  // Initial platzieren
   jumpNo();
+});
 
-  // Wenn man "No" anklicken/hovern will -> springt er weg
-  noBtn.addEventListener("pointerenter", jumpNo);
-  noBtn.addEventListener("pointerdown", (e) => { e.preventDefault(); jumpNo(); });
-  noBtn.addEventListener("click", (e) => { e.preventDefault(); jumpNo(); });
+yesBtn.addEventListener("click",()=>{
+  document.body.innerHTML='<div class="success">YAAAY ❤️</div>';
+});
 
-  // Yes Aktion
-  yesBtn.addEventListener("click", () => {
-    document.body.innerHTML = `<div class="success">YAAAY ❤️<br/>You made my day!</div>`;
-    for(let i=0;i<18;i++) spawnHeart(true);
-  });
-
-  // Herzen
-  function spawnHeart(burst=false){
-    const heart = document.createElement("div");
-    heart.className = "heart";
-    heart.textContent = "❤️";
-
-    const x = burst ? (window.innerWidth*0.5 + (Math.random()-0.5)*320) : (Math.random()*window.innerWidth);
-    heart.style.left = x + "px";
-
-    const size = burst ? (18 + Math.random()*26) : (18 + Math.random()*34);
-    heart.style.fontSize = size + "px";
-
-    const dur = burst ? (2.5 + Math.random()*2.5) : (6 + Math.random()*6);
-    heart.style.animationDuration = dur + "s";
-
-    document.body.appendChild(heart);
-    setTimeout(() => heart.remove(), dur*1000);
-  }
-  setInterval(() => spawnHeart(false), 450);
-
-  // Bei Resize neu clampen, damit No weiterhin sichtbar bleibt
-  window.addEventListener("resize", () => {
-    if(currentIndex >= 0) moveNoToPoint(currentIndex);
-  });
+/* Herzen */
+function spawnHeart(){
+  const heart=document.createElement("div");
+  heart.className="heart";
+  heart.innerHTML="❤️";
+  heart.style.left=Math.random()*100+"vw";
+  heart.style.animationDuration=(5+Math.random()*5)+"s";
+  heart.style.fontSize=(22+Math.random()*30)+"px";
+  document.body.appendChild(heart);
+  setTimeout(()=>heart.remove(),10000);
+}
+setInterval(spawnHeart,600);
 </script>
+
 </body>
 </html>
