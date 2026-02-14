@@ -1,150 +1,232 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Valentine</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Valentine</title>
 
-<style>
-body {
-    margin: 0;
-    height: 100vh;
-    background: #eaa0a8;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-family: Arial, sans-serif;
-    overflow: hidden;
-}
-
-/* Card */
-.card {
-    background: white;
-    padding: 40px 60px;
-    border-radius: 20px;
-    text-align: center;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-    position: relative;
-    z-index: 10;
-}
-
-h1 {
-    color: red;
-    margin-bottom: 30px;
-}
-
-/* Buttons */
-.buttons {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-}
-
-button {
-    padding: 12px 25px;
-    font-size: 16px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-#yesBtn {
-    background: #9be3a5;
-}
-
-#yesBtn:hover {
-    transform: scale(1.1);
-}
-
-#noBtn {
-    background: #f28b82;
-    position: absolute;
-}
-
-/* Floating Hearts */
-.heart {
-    position: absolute;
-    font-size: 24px;
-    animation: float 10s linear infinite;
-    opacity: 0.8;
-}
-
-@keyframes float {
-    0% {
-        transform: translateY(100vh) rotate(0deg);
+  <style>
+    :root{
+      --bg:#eaa0a8;
+      --card:#ffffff;
+      --shadow: 0 22px 50px rgba(0,0,0,.18);
+      --radius: 26px;
+      --red:#ff1f3a;
+      --yes:#a9f1b8;
+      --yes2:#78e49a;
+      --no:#ff9a9a;
+      --no2:#ff6f7b;
     }
-    100% {
-        transform: translateY(-10vh) rotate(360deg);
+
+    *{ box-sizing:border-box; }
+
+    body{
+      margin:0;
+      height:100vh;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      background: radial-gradient(1200px 600px at 50% 20%, #f6bcc2 0%, var(--bg) 60%, #e4929d 100%);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      overflow:hidden;
     }
-}
-</style>
+
+    /* Floating hearts */
+    .heart{
+      position:absolute;
+      font-size: 26px;
+      opacity:.85;
+      filter: drop-shadow(0 6px 10px rgba(0,0,0,.15));
+      animation: floatUp linear forwards;
+      pointer-events:none;
+    }
+    @keyframes floatUp{
+      from{ transform: translateY(105vh) scale(.9) rotate(0deg); }
+      to  { transform: translateY(-15vh) scale(1.1) rotate(360deg); }
+    }
+
+    .card{
+      width:min(820px, 92vw);
+      min-height: 320px;
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 54px 56px 46px;
+      position: relative;
+      z-index: 5;
+    }
+
+    .title{
+      margin: 0 0 34px;
+      font-size: clamp(34px, 3.4vw, 52px);
+      line-height: 1.1;
+      text-align:center;
+      color: var(--red);
+      font-weight: 900;
+      letter-spacing: .2px;
+      text-shadow: 0 2px 0 rgba(0,0,0,.03);
+    }
+
+    .sub{
+      margin: 0 0 30px;
+      text-align:center;
+      color:#444;
+      font-size: 16px;
+      opacity:.8;
+    }
+
+    /* Buttons row */
+    .btn-row{
+      display:flex;
+      justify-content:center;
+      gap: 18px;
+      position: relative;
+      height: 72px; /* keeps layout stable */
+      margin-top: 10px;
+    }
+
+    button{
+      border: none;
+      border-radius: 14px;
+      padding: 14px 30px;
+      font-size: 18px;
+      font-weight: 800;
+      cursor:pointer;
+      transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+      box-shadow: 0 10px 22px rgba(0,0,0,.12);
+      user-select:none;
+    }
+
+    #yesBtn{
+      background: linear-gradient(180deg, var(--yes) 0%, var(--yes2) 100%);
+    }
+    #yesBtn:hover{ transform: translateY(-2px) scale(1.03); }
+    #yesBtn:active{ transform: translateY(0px) scale(.99); }
+
+    /* No button is moved within the row, not across the screen */
+    .no-wrap{
+      position: relative;
+      width: 160px;   /* lane so it never overlaps Yes */
+      height: 72px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow: hidden; /* keeps it inside its lane */
+    }
+
+    #noBtn{
+      position:absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      background: linear-gradient(180deg, var(--no) 0%, var(--no2) 100%);
+    }
+
+    #noBtn:hover{ filter: brightness(1.02); }
+
+    /* Success screen */
+    .success{
+      height:100vh;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      background: radial-gradient(900px 500px at 50% 30%, #ffe0e6 0%, #ffb7c5 55%, #ff9db1 100%);
+      font-size: clamp(38px, 4.5vw, 64px);
+      color: #ff1f3a;
+      font-weight: 1000;
+      text-align:center;
+      padding: 24px;
+    }
+  </style>
 </head>
 
 <body>
+  <div class="card" id="card">
+    <h1 class="title">Shayyyy Will you be my Valentine?</h1>
+    <p class="sub">Be careful… the "No" button is a bit shy 😈❤️</p>
 
-<div class="card">
-    <h1>Will you be my Valentine?</h1>
-    <div class="buttons">
-        <button id="yesBtn" onclick="sayYes()">Yes</button>
+    <div class="btn-row" id="row">
+      <button id="yesBtn">Yes</button>
+
+      <div class="no-wrap" id="noWrap">
         <button id="noBtn">No</button>
+      </div>
     </div>
-</div>
+  </div>
 
 <script>
-const noBtn = document.getElementById("noBtn");
+  const yesBtn = document.getElementById("yesBtn");
+  const noBtn  = document.getElementById("noBtn");
+  const noWrap = document.getElementById("noWrap");
 
-/* No Button springt weg */
-function moveButton() {
-    const maxX = window.innerWidth - noBtn.offsetWidth;
-    const maxY = window.innerHeight - noBtn.offsetHeight;
+  // ~2 cm on most screens: 20px
+  const STEP = 20;
 
-    const randomX = Math.floor(Math.random() * maxX);
-    const randomY = Math.floor(Math.random() * maxY);
+  // Direction flips when we hit bounds
+  let dir = 1;
+  let offset = 0;
 
-    noBtn.style.left = randomX + "px";
-    noBtn.style.top = randomY + "px";
-}
+  function clamp(val, min, max){ return Math.max(min, Math.min(max, val)); }
 
-noBtn.addEventListener("mouseover", moveButton);
-noBtn.addEventListener("click", moveButton);
+  function nudgeNo(){
+    const wrapW = noWrap.clientWidth;
+    const btnW  = noBtn.offsetWidth;
 
-/* Yes Button */
-function sayYes() {
-    document.body.innerHTML = `
-        <div style="
-            height:100vh;
-            display:flex;
-            justify-content:center;
-            align-items:center;
-            background:#ffccd5;
-            font-size:40px;
-            color:red;
-            font-weight:bold;">
-            YAAAY ❤️
-        </div>
-    `;
-}
+    // Max offset from center so button stays fully inside lane
+    const maxOffset = Math.floor((wrapW - btnW) / 2) - 2; // small margin
+    if (maxOffset <= 0) return;
 
-/* Herzen generieren */
-function createHearts() {
+    // Try to move by STEP, but stay within bounds
+    let next = offset + dir * STEP;
+
+    if (next >  maxOffset) { dir = -1; next = offset + dir * STEP; }
+    if (next < -maxOffset) { dir =  1; next = offset + dir * STEP; }
+
+    offset = clamp(next, -maxOffset, maxOffset);
+
+    // Move horizontally only (no jumping around)
+    noBtn.style.transform = `translate(calc(-50% + ${offset}px), -50%)`;
+  }
+
+  // Make it hard to click "No"
+  noBtn.addEventListener("pointerenter", nudgeNo);
+  noBtn.addEventListener("pointerdown", (e) => { e.preventDefault(); nudgeNo(); });
+  noBtn.addEventListener("click", (e) => { e.preventDefault(); nudgeNo(); });
+
+  // Yes action
+  yesBtn.addEventListener("click", () => {
+    document.body.innerHTML = `<div class="success">YAAAY ❤️<br/>You made my day!</div>`;
+    // little heart burst
+    for(let i=0;i<20;i++) spawnHeart(true);
+  });
+
+  // Floating hearts generator
+  function spawnHeart(burst=false){
     const heart = document.createElement("div");
-    heart.classList.add("heart");
-    heart.innerHTML = "❤️";
+    heart.className = "heart";
+    heart.textContent = "❤️";
 
-    heart.style.left = Math.random() * 100 + "vw";
-    heart.style.animationDuration = (5 + Math.random() * 5) + "s";
-    heart.style.fontSize = (20 + Math.random() * 30) + "px";
+    const x = burst ? (window.innerWidth * 0.5 + (Math.random()-0.5)*300) : (Math.random()*window.innerWidth);
+    heart.style.left = x + "px";
+
+    const size = burst ? (18 + Math.random()*26) : (18 + Math.random()*34);
+    heart.style.fontSize = size + "px";
+
+    const dur = burst ? (2.5 + Math.random()*2.5) : (6 + Math.random()*6);
+    heart.style.animationDuration = dur + "s";
 
     document.body.appendChild(heart);
+    setTimeout(() => heart.remove(), dur*1000);
+  }
 
-    setTimeout(() => {
-        heart.remove();
-    }, 10000);
-}
+  setInterval(() => spawnHeart(false), 450);
 
-setInterval(createHearts, 500);
+  // Ensure No button stays valid on resize
+  window.addEventListener("resize", () => {
+    offset = 0;
+    dir = 1;
+    noBtn.style.transform = `translate(-50%, -50%)`;
+  });
 </script>
-
 </body>
 </html>
